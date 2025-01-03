@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"github.com/alpgozbasi/dms-ocr/internal/models"
+	"github.com/alpgozbasi/dms-ocr/internal/ocr"
 	"github.com/alpgozbasi/dms-ocr/internal/storage"
 	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
@@ -96,10 +97,16 @@ func (h *DocumentHandler) UploadFile(c *gin.Context) {
 		fileName = fileHeader.Filename
 	}
 
+	ocrResult, err := h.performOCR(localPath)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to perform OCR"})
+		return
+	}
+
 	doc := models.Document{
 		FileName:  fileName,
 		FilePath:  localPath,
-		OCRText:   "", // will be filled after OCR
+		OCRText:   ocrResult,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
@@ -128,4 +135,12 @@ func (h *DocumentHandler) UploadFile(c *gin.Context) {
 		"document_id": doc.ID,
 		"file_path":   doc.FilePath,
 	})
+}
+
+func (h *DocumentHandler) performOCR(filePath string) (string, error) {
+	text, err := ocr.ExtractText(filePath)
+	if err != nil {
+		return "", err
+	}
+	return text, nil
 }
