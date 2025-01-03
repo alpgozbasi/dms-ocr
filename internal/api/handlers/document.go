@@ -138,7 +138,7 @@ func (h *DocumentHandler) UploadFile(c *gin.Context) {
 }
 
 func (h *DocumentHandler) performOCR(filePath string) (string, error) {
-	text, err := ocr.ExtractText(filePath)
+	text, err := ocr.ExtractOCRText(filePath)
 	if err != nil {
 		return "", err
 	}

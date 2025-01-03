@@ -2,7 +2,7 @@ package ocr
 
 import "github.com/otiai10/gosseract"
 
-func ExtractText(filepath string) (string, error) {
+func ExtractOCRText(filepath string) (string, error) {
 	client := gosseract.NewClient()
 	defer client.Close()
 
